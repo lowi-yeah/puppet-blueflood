@@ -11,8 +11,11 @@
 #   e.g. "Specify one or more upstream ntp servers as an array."
 #
 class blueflood (
-  $package_name = $::blueflood::params::package_name,
-  $service_name = $::blueflood::params::service_name,
+  $blueflood_group  = $::blueflood::params::blueflood_group,
+  $blueflood_user   = $::blueflood::params::blueflood_user,
+  $install_location = $::blueflood::params::install_location,
+  $package_name     = $::blueflood::params::package_name,
+  $service_name     = $::blueflood::params::service_name,
 ) inherits ::blueflood::params {
 
   # validate parameters here

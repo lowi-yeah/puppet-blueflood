@@ -17,4 +17,7 @@ class blueflood::params {
       fail("${::operatingsystem} not supported")
     }
   }
+  $blueflood_group = 'root'
+  $blueflood_user = 'root'
+  $install_location = '/etc/blueflood'
 }

@@ -1,0 +1,209 @@
+#!/bin/sh
+# tomcat  This is the init script for starting up a tomcat server
+#
+# chkconfig: - 64 36
+# description: Starts and stops the tomcat application server
+# processname: java
+# pidfile: /var/run/tomcat.pid
+
+# Set defaults for configuration variables
+CATALINA_HOME=/home/grid/blueflood
+CATALINA_USER=grid
+
+
+# Source function library.
+INITD=/etc/rc.d/init.d
+HAS_INIT_FUNCTIONS=0
+if [ -f  $INITD/functions ] ; then
+  . $INITD/functions
+  HAS_INIT_FUNCTIONS=1
+fi
+if [ -f /lib/lsb/init-functions ] ; then
+  . /lib/lsb/init-functions
+fi
+
+# Get config.
+if [ -f /etc/sysconfig/network ] ; then
+    . /etc/sysconfig/network
+fi
+
+# Find the name of the script
+NAME=`basename $0`
+if [ ${NAME:0:1} = "S" -o ${NAME:0:1} = "K" ] ; then
+  NAME=${NAME:3}
+fi
+
+# For SELinux we need to use 'runuser' not 'su'
+if [ -x /sbin/runuser ] ; then
+    SU=runuser
+else
+    SU=su
+fi
+
+
+CATALINA_SCRIPT=$CATALINA_HOME/run.sh
+# not used currently
+CATALINA_PID=/var/run/${NAME}.pid
+
+# Check that networking is up.
+# Pretty much need it for tomcat.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+[ -f $CATALINA_SCRIPT ] || exit 0
+
+
+
+print_success() {
+  if [ $HAS_INIT_FUNCTIONS = 1 ] ; then
+    echo_success
+  else
+    log_action_end_msg 0
+  fi
+}
+
+print_failure() {
+  if [ $HAS_INIT_FUNCTIONS = 1 ] ; then
+    echo_failure
+  else
+    log_action_end_msg 1
+  fi
+}
+
+
+start(){
+  getpidoftomcat
+  if [ $pid ] ; then
+    echo -n $"${NAME} is already running with pid $pid. "
+    print_failure
+  else
+    echo -n $"starting ${NAME} "
+    # if we have a nanny, use it
+    if [ -x $CATALINA_HOME/bin/nanny.sh ] ; then
+      if [ "$USER" = "$CATALINA_USER" ] ; then
+        $CATALINA_HOME/bin/nanny.sh $CATALINA_SCRIPT >>$CATALINA_HOME/logs/$NAME.log 2>&1 &
+      else
+        $SU -l $CATALINA_USER -c "$CATALINA_HOME/bin/nanny.sh $CATALINA_SCRIPT >>$CATALINA_HOME/logs/$NAME.log 2>&1 &"
+      fi
+    else
+      if [ "$USER" = "$CATALINA_USER" ] ; then
+        $CATALINA_SCRIPT > $CATALINA_HOME/logs/$NAME.log 2>&1 &
+      else
+        $SU -l $CATALINA_USER -c "$CATALINA_SCRIPT > $CATALINA_HOME/logs/$NAME.log 2>&1 &"
+      fi
+    fi
+    sleep 1
+    getpidoftomcat
+    if [ $pid ] ; then
+      print_success
+#     if [ -d /var/lock/subsys ] ; then
+#       touch /var/lock/subsys/${NAME}
+#     fi
+#     echo $pid > $CATALINA_PID
+    else
+      print_failure
+    fi
+  fi
+  echo
+}
+
+stop(){
+  getpidoftomcat
+  if [ -z $pid ] ; then
+    echo -n $"${NAME} is not running. "
+    print_failure
+  else
+    echo -n $"Stopping ${NAME} service: "
+    killtomcat TERM
+    for i in `seq 10` ; do
+      getpidoftomcat
+      if [ -z $pid ] ; then
+        break;
+      fi
+      echo -n '. '
+      sleep 1
+    done
+    getpidoftomcat
+    if [ $pid ] ; then
+      killtomcat KILL
+      sleep 1
+    fi
+    getpidoftomcat
+    if [ $pid ] ; then
+      print_failure
+    else
+      print_success
+    fi
+  fi
+  echo
+# rm -f $CATALINA_PID
+# if [ -d /var/lock/subsys ] ; then
+#   rm -f /var/lock/subsys/${NAME}
+# fi
+}
+
+getpidoftomcat() {
+  pid=`pgrep -n -f "blueflood.config=file://$CATALINA_HOME/blueflood.properties"`
+}
+
+killtomcat(){
+  getpidoftomcat
+  if [ $pid ] ; then
+    echo -n "Killing recalcitrant $NAME:$pid with $1... "
+    kill -${1} $pid
+    return 1
+  fi
+  return 0
+}
+
+status(){
+  getpidoftomcat
+  if [ $pid ] ; then
+    echo $"${NAME} is running with pid $pid"
+  else
+    echo $"${NAME} is not running"
+    exit 1
+  fi
+}
+
+
+
+restart(){
+    stop
+    start
+}
+
+condrestart(){
+    [ -e /var/lock/subsys/${NAME} ] && restart
+}
+
+condstop(){
+    [ -e /var/lock/subsys/${NAME} ] && stop
+}
+
+
+# See how we were called.
+case "$1" in
+  start)
+  start
+  ;;
+  stop)
+  stop
+  ;;
+  status)
+  status
+  ;;
+  restart)
+  restart
+  ;;
+  condrestart)
+  condrestart
+  ;;
+  condstop)
+  condstop
+  ;;
+  *)
+  echo $"Usage: $0 {start|stop|status|restart|condrestart|condstop}"
+  exit 1
+esac
+
+exit 0
