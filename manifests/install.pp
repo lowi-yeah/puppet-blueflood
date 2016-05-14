@@ -3,12 +3,6 @@
 # This class is called from blueflood for install.
 #
 class blueflood::install {
-
-  package { 'mvn':
-    ensure  => present,
-    name    => 'mvn',
-  }
-
   package { $::blueflood::package_name:
     ensure => present,
   }
@@ -22,9 +16,6 @@ class blueflood::install {
     command => 'mvn package -P all-modules',
     creates => "${::blueflood::install_location}/blueflood-all/target/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar",
     cwd     => $::blueflood::install_location,
-    require => [
-      Package['mvn'],
-      Vcsrepo[$::blueflood::install_location]
-    ],
+    require => Vcsrepo[$::blueflood::install_location],
   }
 }
