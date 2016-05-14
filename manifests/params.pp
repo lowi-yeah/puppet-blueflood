@@ -33,7 +33,7 @@ class blueflood::params {
   $service_enable      = true
   $service_ensure      = 'present'
   $service_manage      = true
-  $service_name        = 'blueflood'
+  $service_name        = 'blueflood-db'
   $service_retries     = 999
   $service_startsecs   = 10
   $service_stopsecs    = 10
