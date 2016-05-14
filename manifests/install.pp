@@ -2,20 +2,18 @@
 #
 # This class is called from blueflood for install.
 #
-class blueflood::install {
-  package { $::blueflood::package_name:
-    ensure => present,
-  }
-  vcsrepo { $::blueflood::install_location:
-    ensure   => present,
-    provider => 'git',
-    source   => 'https://github.com/rackerlabs/blueflood.git',
-  }
-  exec { 'build blueflood':
+class blueflood::install inherits blueflood {
+
+ vcsrepo { $base_dir:
+   ensure   => present,
+   provider => 'git',
+   source   => 'https://github.com/rackerlabs/blueflood.git',
+ }
+
+  exec { 'download-blueflood':
     path    => ['/usr/bin'],
-    command => 'mvn package -P all-modules',
-    creates => "${::blueflood::install_location}/blueflood-all/target/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar",
-    cwd     => $::blueflood::install_location,
-    require => Vcsrepo[$::blueflood::install_location],
+    command => 'curl -s -L https://github.com/rackerlabs/blueflood/releases/latest | egrep -o \'rackerlabs/blueflood/releases/download/rax-release-.*/blueflood-all-.*-jar-with-dependencies.jar\' |  xargs -I % curl -C - -L https://github.com/% --create-dirs -o blueflood-all/target/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar',
+    creates => "$base_dir/blueflood-all/target/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar",
+    cwd     => $base_dir
   }
 }
