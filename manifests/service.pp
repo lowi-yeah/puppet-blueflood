@@ -29,7 +29,7 @@ class blueflood::service(
         stderr_logfile_keep    => $blueflood::service_stderr_logfile_keep,
         stopsignal             => 'INT',
         stopasgroup            => true,
-        require                => [Class['mosquitto::config'], Class['::supervisor']],
+        require                => [Class['blueflood::config'], Class['::supervisor']],
     }
 
     if $blueflood::service_enable == true {

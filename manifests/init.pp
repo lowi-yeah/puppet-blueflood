@@ -6,22 +6,19 @@
 #
 # TODO: Document each class parameter.
 #
-# [*blueflood_gc_log_opts*]
-#   Use this parameter for all Java Garbage Collection settings with the exception of configuring `-Xloggc:...`.
-#   Use $gc_log_file for the latter.
-#
-# [*blueflood_log4j_opts*]
-#   Use this parameter for all logging settings with the exception of configuring `-Dlog4j.configuration.file=...`.
-#   Use $logging_config for the latter.
-#
 
 class blueflood (
+  $jar_name                         = $blueflood::params::jar_name,
+  $jar_file                         = $blueflood::params::jar_file,
   $base_dir                         = $blueflood::params::base_dir,
+  $log_dir                          = $blueflood::params::log_dir,
+  $config_dir                       = $blueflood::params::config_dir,
   $config                           = $blueflood::params::config,
   $logging_config                   = $blueflood::params::logging_config,
+  $jar_dir                          = $blueflood::params::jar_dir,
   $jar                              = $blueflood::params::jar,
   $config_template                  = $blueflood::params::config_template,
-  $logging_template                 = $blueflood::params::logging_template,
+  $logging_config_template          = $blueflood::params::logging_config_template,
   $jmx_port                         = $blueflood::params::jmx_port,
   $blueflood_config_opts            = $blueflood::params::blueflood_config_opts,
   $blueflood_gc_log_opts            = $blueflood::params::blueflood_gc_log_opts,
@@ -46,6 +43,7 @@ class blueflood (
   $service_stdout_logfile_keep      = $blueflood::params::service_stdout_logfile_keep,
   $service_stdout_logfile_maxsize   = $blueflood::params::service_stdout_logfile_maxsize,
   $shell                            = $blueflood::params::shell,
+  $system_log_dir                   = $blueflood::params::system_log_dir,
   $uid                              = $blueflood::params::uid,
   $user                             = $blueflood::params::user,
   $user_description                 = $blueflood::params::user_description,
@@ -62,12 +60,17 @@ class blueflood (
   
 ) inherits blueflood::params {
 
+  validate_string($jar_name)
+  validate_string($jar_file)
   validate_absolute_path($base_dir)
+  validate_absolute_path($log_dir)
+  validate_absolute_path($config_dir)
   validate_absolute_path($config)
   validate_absolute_path($logging_config)
+  validate_absolute_path($jar_dir)
   validate_absolute_path($jar)
   validate_string($config_template)
-  validate_string($logging_template)
+  validate_string($logging_config_template)
   if !is_integer($jmx_port) { fail('The $jmx_port parameter must be an integer number') }
   validate_string($blueflood_config_opts)                
   validate_string($blueflood_gc_log_opts)                
@@ -95,6 +98,7 @@ class blueflood (
   if !is_integer($service_stdout_logfile_keep) { fail('The $service_stdout_logfile_keep parameter must be an integer number') }
   validate_string($service_stdout_logfile_maxsize)
   validate_absolute_path($shell)
+  validate_absolute_path($system_log_dir)
   if !is_integer($uid) { fail('The $uid parameter must be an integer number') }
   validate_string($user)
   validate_string($user_description)

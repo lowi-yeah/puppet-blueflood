@@ -5,12 +5,19 @@
 #
 class blueflood::params {
 
-  $base_dir            = '/opt/blueflood'
-  $config              = "${base_dir}/config/blueflood.properties"
-  $logging_config      = "${base_dir}/config/blueflood-log4j.properties"
-  $jar                 = "${base_dir}/blueflood-all/target/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar"
-  $config_template     = 'blueflood/blueflood.properties.erb'
-  $logging_template    = 'blueflood/blueflood-log4j.properties.erb'
+  
+  $base_dir                 = '/opt/blueflood'
+  $config_dir               = "${base_dir}/config"
+  $log_dir                  = "/var/log/blueflood"
+  $jar_name                 = 'blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar'
+  # $jar_file                 = "${base_dir}/files/${jar_name}"
+  $jar_file                 = 'http://lowi.org/guadalete/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar'
+  $config                   = "${config_dir}/blueflood.properties"
+  $logging_config           = "${config_dir}/blueflood-log4j.properties"
+  $jar_dir                  = "${base_dir}/bin"
+  $jar                      = "${jar_dir}/${jar_name}"
+  $config_template          = 'blueflood/blueflood.properties.erb'
+  $logging_config_template  = 'blueflood/blueflood-log4j.properties.erb'
 
   $jmx_port = 9180
 
@@ -36,12 +43,13 @@ class blueflood::params {
   $service_name        = 'blueflood'
   $service_retries     = 999
   $service_startsecs   = 10
-  $service_stopsecs    = 10
+  $service_stopsecs    = 120
   $service_stderr_logfile_keep    = 10
   $service_stderr_logfile_maxsize = '20MB'
   $service_stdout_logfile_keep    = 5
   $service_stdout_logfile_maxsize = '20MB'
   $shell               = '/bin/bash'
+  $system_log_dir      = $log_dir
   $uid                 = 53073
   $user                = 'blueflood'
   $user_description    = 'Blueflood system account'

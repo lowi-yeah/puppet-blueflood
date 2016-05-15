@@ -9,87 +9,82 @@ describe 'blueflood' do
           :operatingsystem => operatingsystem,
         }}
 
-        default_broker_configuration_file  = '/opt/blueflood/config/blueflood.properties'
+        default_jar_file  = '/opt/blueflood/bin/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar'
+        # default_jar_file  = '/opt/blueflood/bin/jar.txt'
+        default_configuration_file  = '/opt/blueflood/config/blueflood.properties'
         default_logging_configuration_file = '/opt/blueflood/config/log4j.properties'
 
         describe "blueflood with default settings on #{osfamily}" do
-          let(:params) {{ }}
+           let(:params) {{
+            # :service_config_file => 'undef',
+          }}
           # We must mock $::operatingsystem because otherwise this test will
           # fail when you run the tests on e.g. Mac OS X.
           it { should compile.with_all_deps }
 
-   #       it { should contain_class('blueflood::params') }
-   #       it { should contain_class('blueflood') }
-   #       it { should contain_class('blueflood::users').that_comes_before('blueflood::install') }
-   #       it { should contain_class('blueflood::install').that_comes_before('blueflood::config') }
-   #       it { should contain_class('blueflood::config') }
-   #       it { should contain_class('blueflood::service').that_subscribes_to('blueflood::config') }
-#
-   #       it { should contain_package('blueflood').with_ensure('present') }
-#
-   #       it { should contain_group('blueflood').with({
-   #         'ensure'     => 'present',
-   #         'gid'        => 53072,
-   #       })}
-#
-   #       it { should contain_user('blueflood').with({
-   #         'ensure'     => 'present',
-   #         'home'       => '/home/blueflood',
-   #         'shell'      => '/bin/bash',
-   #         'uid'        => 53072,
-   #         'comment'    => 'Blueflood system account',
-   #         'gid'        => 'blueflood',
-   #         'managehome' => true,
-   #       })}
-#
-   #       it { should contain_file('/opt/blueflood/logs').with({
-   #         'ensure' => 'directory',
-   #         'owner'  => 'blueflood',
-   #         'group'  => 'blueflood',
-   #         'mode'   => '0755',
-   #       })}
-#
-   #       it { should contain_file('/var/log/blueflood').with({
-   #         'ensure' => 'directory',
-   #         'owner'  => 'blueflood',
-   #         'group'  => 'blueflood',
-   #         'mode'   => '0755',
-   #       })}
+          it { should contain_class('blueflood::params') }
+          it { should contain_class('blueflood') }
+          it { should contain_class('blueflood::users').that_comes_before('blueflood::install') }
+          it { should contain_class('blueflood::install').that_comes_before('blueflood::config') }
+          it { should contain_class('blueflood::config') }
+          it { should contain_class('blueflood::service').that_subscribes_to('blueflood::config') }
 
-         # it { should contain_file(default_broker_configuration_file).with({
-         #     'ensure' => 'file',
-         #     'owner'  => 'root',
-         #     'group'  => 'root',
-         #     'mode'   => '0644',
-         #   }).
-         #   with_content(/^broker.id=0$/).
-         #   with_content(/^port=9092$/).
-         #   with_content(/^log.dirs=\/app\/kafka\/log$/).
-         #   with_content(/^zookeeper.connect=localhost:2181$/)
-         # }
-#
-         # it { should contain_file(default_logging_configuration_file).with({
-         #     'ensure' => 'file',
-         #     'owner'  => 'root',
-         #     'group'  => 'root',
-         #     'mode'   => '0644',
-         #   }).
-         #   with_content(/^log4j.appender.kafkaAppender.File=\/var\/log\/kafka\/server.log$/).
-         #   with_content(/^log4j.appender.stateChangeAppender.File=\/var\/log\/kafka\/state-change.log$/).
-         #   with_content(/^log4j.appender.requestAppender.File=\/var\/log\/kafka\/kafka-request.log$/).
-         #   with_content(/^log4j.appender.controllerAppender.File=\/var\/log\/kafka\/controller.log$/)
-         # }
+         # it { should contain_package('blueflood').with_ensure('present') }
 
-          # it { should contain_file('kafka-log-directory-/app/kafka/log').with({
-          #   'ensure'       => 'directory',
-          #   'path'         => '/app/kafka/log',
-          #   'owner'        => 'kafka',
-          #   'group'        => 'kafka',
-          #   'mode'         => '0750',
-          #   'recurse'      => true,
-          #   'recurselimit' => 0,
-          # })}
+         it { should contain_group('blueflood').with({
+           'ensure'     => 'present',
+           'gid'        => 53073,
+         })}
 
+         it { should contain_user('blueflood').with({
+           'ensure'     => 'present',
+           'home'       => '/home/blueflood',
+           'shell'      => '/bin/bash',
+           'uid'        => 53073,
+           'comment'    => 'Blueflood system account',
+           'gid'        => 'blueflood',
+           'managehome' => true,
+         })}
+
+
+          it { should contain_file(default_jar_file).with({
+            'ensure' => 'file',
+            'owner'  => 'blueflood',
+            'group'  => 'blueflood',
+            'mode'   => '0755',
+          })}
+
+         # it { should contain_file('/opt/blueflood/logs').with({
+         #   'ensure' => 'directory',
+         #   'owner'  => 'blueflood',
+         #   'group'  => 'blueflood',
+         #   'mode'   => '0644',
+         # })}
+
+         it { should contain_file('/var/log/blueflood').with({
+           'ensure' => 'directory',
+           'owner'  => 'blueflood',
+           'group'  => 'blueflood',
+           'mode'   => '0644',
+         })}
+
+         it { should contain_file(default_configuration_file).with({
+             'ensure' => 'file',
+             'owner'  => 'blueflood',
+             'group'  => 'blueflood',
+             'mode'   => '0644',
+           })
+           .with_content(/^CASSANDRA_HOSTS=127.0.0.1:9160$/)
+           .with_content(/^DEFAULT_CASSANDRA_PORT=9160$/)
+         }
+         #it { should contain_file(default_logging_configuration_file).with({
+         #    'ensure' => 'file',
+         #    'owner'  => 'blueflood',
+         #    'group'  => 'blueflood',
+         #    'mode'   => '0644',
+         #  })
+         #
+         #}
          
           it { should contain_supervisor__service('blueflood').with({
             'ensure'      => 'present',
@@ -127,7 +122,7 @@ describe 'blueflood' do
             :gid              => 456,
             :group            => 'bluefloodgroup',
             :uid              => 123,
-            :user             => 'bluefloodauser',
+            :user             => 'blueflooduser',
             :user_description => 'Blueflood user',
             :user_home        => '/home/blueflooduser',
           }}
@@ -135,9 +130,9 @@ describe 'blueflood' do
           it { should_not contain_group('blueflood') }
           it { should_not contain_user('blueflood') }
 
-          it { should contain_user('bluefloodauser').with({
+          it { should contain_user('blueflooduser').with({
             'ensure'     => 'present',
-            'home'       => '/home/bluefloodauser',
+            'home'       => '/home/blueflooduser',
             'shell'      => '/bin/bash',
             'uid'        => 123,
             'comment'    => 'Blueflood user',
@@ -147,7 +142,7 @@ describe 'blueflood' do
 
           it { should contain_group('bluefloodgroup').with({
             'ensure'     => 'present',
-            'gid'        => 456,
+            'gid'        => 457,
           })}
         end
 
