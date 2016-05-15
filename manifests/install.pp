@@ -10,6 +10,12 @@ class blueflood::install inherits blueflood {
    source   => 'https://github.com/rackerlabs/blueflood.git',
  }
 
+ # package { 'java-runtime-environment':
+ #    name   => $java_package_name,
+ #    ensure => $java_package_ensure,
+ #    alias  => java-jdk,
+ #  }
+
   exec { 'download-blueflood':
     path    => ['/usr/bin'],
     command => 'curl -s -L https://github.com/rackerlabs/blueflood/releases/latest | egrep -o \'rackerlabs/blueflood/releases/download/rax-release-.*/blueflood-all-.*-jar-with-dependencies.jar\' |  xargs -I % curl -C - -L https://github.com/% --create-dirs -o blueflood-all/target/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar',

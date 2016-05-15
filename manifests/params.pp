@@ -5,12 +5,12 @@
 #
 class blueflood::params {
 
-  $base_dir         = '/opt/blueflood'
+  $base_dir            = '/opt/blueflood'
   $config              = "${base_dir}/config/blueflood.properties"
   $logging_config      = "${base_dir}/config/blueflood-log4j.properties"
   $jar                 = "${base_dir}/blueflood-all/target/blueflood-all-2.0.0-SNAPSHOT-jar-with-dependencies.jar"
-  $config_template     = 'blueflood/blueflood.properties'
-  $logging_template    = 'blueflood/blueflood-log4j.properties'
+  $config_template     = 'blueflood/blueflood.properties.erb'
+  $logging_template    = 'blueflood/blueflood-log4j.properties.erb'
 
   $jmx_port = 9180
 
@@ -22,7 +22,7 @@ class blueflood::params {
   $blueflood_log4j_opts           = "-Dlog4j.configuration=file:${logging_config}"
   $blueflood_cp_opts              = "-classpath ${jar} com.rackspacecloud.blueflood.service.BluefloodServiceStarter"
 
-  $command             = "$JAVA_HOME/bin/java ${$blueflood_config_opts} ${$blueflood_gc_log_opts} ${$blueflood_heap_opts} ${$blueflood_jmx_opts} ${$blueflood_jvm_performance_opts} ${$blueflood_log4j_opts} ${$blueflood_cp_opts$}"
+  $command             = "java ${blueflood_config_opts} ${blueflood_gc_log_opts} ${blueflood_heap_opts} ${blueflood_jmx_opts} ${blueflood_jvm_performance_opts} ${blueflood_log4j_opts} ${blueflood_cp_opts}"
 
   $gid                 = 53073
   $group               = 'blueflood'
@@ -33,7 +33,7 @@ class blueflood::params {
   $service_enable      = true
   $service_ensure      = 'present'
   $service_manage      = true
-  $service_name        = 'blueflood-db'
+  $service_name        = 'blueflood'
   $service_retries     = 999
   $service_startsecs   = 10
   $service_stopsecs    = 10

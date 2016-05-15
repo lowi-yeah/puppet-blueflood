@@ -1,31 +1,35 @@
-# == Class kafka::service
+# == blueflood kafka::service
 #
-class blueflood::service inherits blueflood {
+class blueflood::service(
+   $service_environment = '',
+) inherits blueflood {
 
-  if !($blueflood::service_ensure in ['present', 'absent']) {
+  if !($service_ensure in ['present', 'absent']) {
     fail('service_ensure parameter must be "present" or "absent"')
   }
 
-  if $blueflood::service_manage == true {
-    supervisor::service { $blueflood::service_name:
-      ensure                 => $blueflood::service_ensure,
-      enable                 => $blueflood::service_enable,
-      command                => "${blueflood::command}",
-      directory              => '/',
-      # environment            => "JMX_PORT=${jmx_port},${kafka_gc_log_opts_real},${kafka_heap_opts_real},${kafka_jmx_opts_real},${kafka_jvm_performance_opts_real},${kafka_log4j_opts_real},${kafka_opts_real}",
-      user                   => $blueflood::user,
-      group                  => $blueflood::group,
-      autorestart            => $blueflood::service_autorestart,
-      startsecs              => $blueflood::service_startsecs,
-      stopwait               => $blueflood::service_stopsecs,
-      retries                => $blueflood::service_retries,
-      stdout_logfile_maxsize => $blueflood::service_stdout_logfile_maxsize,
-      stdout_logfile_keep    => $blueflood::service_stdout_logfile_keep,
-      stderr_logfile_maxsize => $blueflood::service_stderr_logfile_maxsize,
-      stderr_logfile_keep    => $blueflood::service_stderr_logfile_keep,
-      stopsignal             => 'INT',
-      stopasgroup            => true,
-      require                => Class['::supervisor'],
+  if $service_manage == true {
+    supervisor::service { 
+      $service_name:
+        ensure                 => $blueflood::service_ensure,
+        enable                 => $blueflood::service_enable,
+        command                => "${blueflood::command}",
+        directory              => $blueflood::base_dir,
+        environment            => $service_environment,
+        # environment            => "JMX_PORT=${jmx_port},${kafka_gc_log_opts_real},${kafka_heap_opts_real},${kafka_jmx_opts_real},${kafka_jvm_performance_opts_real},${kafka_log4j_opts_real},${kafka_opts_real}",
+        user                   => $blueflood::user,
+        group                  => $blueflood::group,
+        autorestart            => $blueflood::service_autorestart,
+        startsecs              => $blueflood::service_startsecs,
+        stopwait               => $blueflood::service_stopsecs,
+        retries                => $blueflood::service_retries,
+        stdout_logfile_maxsize => $blueflood::service_stdout_logfile_maxsize,
+        stdout_logfile_keep    => $blueflood::service_stdout_logfile_keep,
+        stderr_logfile_maxsize => $blueflood::service_stderr_logfile_maxsize,
+        stderr_logfile_keep    => $blueflood::service_stderr_logfile_keep,
+        stopsignal             => 'INT',
+        stopasgroup            => true,
+        require                => [Class['mosquitto::config'], Class['::supervisor']],
     }
 
     if $blueflood::service_enable == true {
